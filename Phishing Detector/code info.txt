@@ -1,0 +1,160 @@
+# feature_extractor.py
+
+import pandas as pd
+import whois
+from datetime import datetime
+from urllib.parse import urlparse
+import re
+import requests
+from bs4 import BeautifulSoup
+
+import os
+print("🔍 Current working directory:", os.getcwd())
+print("📂 Files in this directory:", os.listdir())
+
+# -----------------------------
+# Feature Extraction Functions
+# -----------------------------
+
+def get_url_length(url):
+    return len(url)
+
+def has_ssl(url):
+    return 1 if url.lower().startswith("https") else 0
+
+def contains_suspicious_keywords(url):
+    keywords = ['login', 'verify', 'secure', 'account', 'update', 'bank']
+    return int(any(keyword in url.lower() for keyword in keywords))
+
+def get_domain_age(url):
+    try:
+        domain = urlparse(url).netloc
+        w = whois.whois(domain)
+        creation = w.creation_date
+        if isinstance(creation, list):
+            creation = creation[0]
+        age_days = (datetime.now() - creation).days
+        return age_days
+    except Exception as e:
+        print(f"Error getting domain age for {url}: {e}")
+        return -1
+
+def has_iframes(url):
+    try:
+        r = requests.get(url, timeout=5)
+        soup = BeautifulSoup(r.text, 'html.parser')
+        return int(len(soup.find_all('iframe')) > 0)
+    except Exception as e:
+        print(f"Error checking iframes for {url}: {e}")
+        return 0
+
+# -----------------------------
+# Apply on Dataset
+# -----------------------------
+
+def extract_features(file_path):
+    df = pd.read_csv(file_path)
+    df['url_length'] = df['url'].apply(get_url_length)
+    df['has_ssl'] = df['url'].apply(has_ssl)
+    df['suspicious_keywords'] = df['url'].apply(contains_suspicious_keywords)
+    df['domain_age'] = df['url'].apply(get_domain_age)
+    df['has_iframes'] = df['url'].apply(has_iframes)
+    df.to_csv('enhanced_dataset.csv', index=False)
+    print("✅ Feature extraction complete. Saved to enhanced_dataset.csv")
+
+# Run feature extraction
+if __name__ == "__main__":
+    extract_features('phishing_data.csv')
+
+# Rule-Based Detection Functions (Member 2's Code)
+
+def is_suspicious_url(url):
+    """
+    Rule to check if a URL contains suspicious patterns based on structure
+    and content checks.
+    """
+    parsed_url = urlparse(url)
+    # Rule 1: URL length (shouldn't be too short or long)
+    if get_url_length(url) < 30 or get_url_length(url) > 150:
+        return True
+
+    # Rule 2: Check if SSL is missing (phishing sites often don't have SSL)
+    if not has_ssl(url):
+        return True
+
+    # Rule 3: Check for suspicious keywords
+    if contains_suspicious_keywords(url):
+        return True
+
+    # Rule 4: Check domain age (new domains might be phishing)
+    if get_domain_age(url) < 30:  # Age in days, 30 is a threshold
+        return True
+
+    # Rule 5: Web scraping content check for phishing indicators (e.g., forms)
+    try:
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            # Check for common phishing signs (e.g., login forms, form submissions)
+            if soup.find('form') or 'login' in soup.text.lower():
+                return True
+    except requests.exceptions.RequestException:
+        # If the site can't be reached or another request error occurs, consider it suspicious
+        return True
+
+    return False
+
+def classify_url(url):
+    """
+    Classifies a URL as 'phishing' or 'legitimate' based on rule-based system.
+    """
+    if is_suspicious_url(url):
+        return 'phishing'
+    else:
+        return 'legitimate'
+
+   
+# Process Single New URL (Member 1's Code with Classification)
+
+def check_url_features(url):
+    url_length = get_url_length(url)
+    ssl_status = has_ssl(url)
+    suspicious_keywords = contains_suspicious_keywords(url)
+    domain_age = get_domain_age(url)
+    classification = classify_url(url)
+
+    return {
+        'url': url,
+        'url_length': url_length,
+        'has_ssl': ssl_status,
+        'suspicious_keywords': suspicious_keywords,
+        'domain_age': domain_age,
+        'classification': classification
+    }
+
+ # Apply classification
+    df['classification'] = df['url'].apply(classify_url)
+
+    df.to_csv('enhanced_dataset_with_classification.csv', index=False)
+    print("Feature extraction and classification complete for dataset URLs. Saved to enhanced_dataset_with_classification.csv")
+
+# Process Single New URL (Member 1's Code with Classification)
+
+def check_url_features(url):
+    url_length = get_url_length(url)
+    ssl_status = has_ssl(url)
+    suspicious_keywords = contains_suspicious_keywords(url)
+    domain_age = get_domain_age(url)
+    classification = classify_url(url)
+
+    return {
+        'url': url,
+        'url_length': url_length,
+        'has_ssl': ssl_status,
+        'suspicious_keywords': suspicious_keywords,
+        'domain_age': domain_age,
+        'classification': classification
+    }
+
+
+

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phishing Detector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e3f2fd;
+            padding: 40px;
+        }
+        h1 {
+            color: #1565c0;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 600px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        button {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .result, .features {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .features ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .features li {
+            background-color: #f1f8ff;
+            margin-bottom: 5px;
+            padding: 8px;
+            border-left: 4px solid #1976d2;
+            border-radius: 4px;
+        }
+        .download-links {
+            margin-top: 20px;
+        }
+        .download-links a {
+            display: block;
+            margin-top: 8px;
+            color: #0d47a1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Phishing Detector</h1>
+
+        <form action="/check" method="POST">
+            <label>Check a Single URL:</label>
+            <input type="text" name="url" placeholder="Enter URL" required>
+            <button type="submit">Check URL</button>
+        </form>
+
+        {% if result %}
+        <div class="result">
+            <p>URL: {{ checked_url }}</p>
+            <p>Classification: <strong>{{ result.upper() }}</strong></p>
+        </div>
+        {% endif %}
+
+        {% if features %}
+        <div class="features">
+            <h3>Extracted Features:</h3>
+            <ul>
+                {% for key, value in features.items() %}
+                <li><strong>{{ key }}:</strong> {{ value }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <hr>
+
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <label>Upload CSV File:</label>
+            <input type="file" name="csv_file" accept=".csv" required>
+            <button type="submit">Analyze CSV</button>
+        </form>
+
+        {% if download_all %}
+        <div class="download-links">
+            <h4>Download Results:</h4>
+            <a href="/download/{{ download_all }}">📄 All Results (enhanced_dataset.csv)</a>
+            <a href="/download/{{ download_legit }}">✅ Legitimate Only (legitimate_sites.csv)</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
