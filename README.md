@@ -66,22 +66,39 @@ Edit
 pip install -r requirements.txt
 Start the Flask server:
 
+
 bash
+
 Copy
+
 Edit
+
 python app.py
+
 Open your browser and visit:
+
 http://127.0.0.1:5000/
 
 CSV Format Example
+
 csv
+
 Copy
+
 Edit
+
 url
+
 http://example.com
+
 https://bank-login-update.com
+
 http://secure-login.biz
 Author
+
+
 Ayush kumar
+
+
 college project on cyber security concerns.
 
