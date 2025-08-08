@@ -56,8 +56,9 @@ Clone the repository:
 bash
 Copy
 Edit
-git clone https://github.com/kagdiyal04/phoshing.git
-cd your-repo-name
+git clone :(https://github.com/kagdiyal04/PHISHING-PROTECTION-/blob/main/README.md
+)
+cd PHISHING-PROTECTION-
 Install required packages:
 
 bash
