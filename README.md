@@ -56,7 +56,7 @@ Clone the repository:
 bash
 Copy
 Edit
-git clone https://github.com/kagdiyal04/your-repo-name.git
+git clone https://github.com/kagdiyal04/phoshing.git
 cd your-repo-name
 Install required packages:
 
