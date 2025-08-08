@@ -1,4 +1,4 @@
-# PHOSHING-PROTECTION-
+# PHISHING-PROTECTION-
 This project is a Flask-based web application that detects phishing websites using rule-based feature extraction. It allows users to input single URLs or upload a CSV file of multiple URLs for classification. The app includes CAPTCHA verification, a clean Bootstrap UI with a blue theme, and allows users to download a CSV containing only legitimate URLs after processing.
 
 Features
